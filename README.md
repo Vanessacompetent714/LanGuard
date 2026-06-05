@@ -61,11 +61,12 @@ until you next unplug.
 ### Homebrew
 
 ```bash
-# (planned) once a tap + signed release are published:
 brew install --cask roypadina/tap/languard
 ```
 
-> Not live yet — see [#brew](https://github.com/roypadina/LanGuard/issues) / the Roadmap.
+> LanGuard is ad-hoc signed (not notarized). On first launch, right-click it in
+> `/Applications` → **Open**, or run once:
+> `xattr -dr com.apple.quarantine "/Applications/LanGuard.app"`
 
 ### Build from source
 
