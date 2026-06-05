@@ -1,57 +1,140 @@
-# LanGuard
+<div align="center">
 
-A tiny macOS menu-bar app that turns **Wi-Fi off when a wired LAN link is up**, and back
-**on when you unplug** — including after sleep. Native Swift, no admin rights, no shell scripts.
+# 🛡️ LanGuard
 
-![menu bar: LAN](https://img.shields.io/badge/menu%20bar-LAN%20%2F%20Wi--Fi-blue) ![macOS 14+](https://img.shields.io/badge/macOS-14%2B-black) ![MIT](https://img.shields.io/badge/license-MIT-green)
+### Wi-Fi off when you're wired. Back on when you're not.
+
+A tiny native macOS menu-bar app that turns **Wi-Fi off the moment a wired LAN link goes up**,
+and back **on when you unplug** — wake-aware, per-interface, no admin rights, no shell scripts.
+
+[![macOS](https://img.shields.io/badge/macOS-14%2B-000000?logo=apple&logoColor=white)](https://www.apple.com/macos/)
+[![Swift](https://img.shields.io/badge/Swift-5-F05138?logo=swift&logoColor=white)](https://swift.org)
+[![SwiftUI](https://img.shields.io/badge/SwiftUI-MenuBarExtra-0A84FF?logo=swift&logoColor=white)](https://developer.apple.com/xcode/swiftui/)
+[![CI](https://github.com/roypadina/LanGuard/actions/workflows/ci.yml/badge.svg)](https://github.com/roypadina/LanGuard/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?logo=opensourceinitiative&logoColor=white)](LICENSE)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?logo=github)](CONTRIBUTING.md)
+[![Stars](https://img.shields.io/github/stars/roypadina/LanGuard?style=social)](https://github.com/roypadina/LanGuard/stargazers)
+
+![LanGuard in the menu bar](docs/screenshots/menubar.png)
+
+</div>
+
+---
+
+## Table of Contents
+
+- [Why](#why)
+- [Features](#features)
+- [Install](#install)
+- [Usage](#usage)
+- [How it works](#how-it-works)
+- [Roadmap](#roadmap)
+- [Contributing](#contributing)
+- [Support](#support)
+- [License](#license)
 
 ## Why
 
-macOS keeps Wi-Fi on even when you're docked over Ethernet — wasting an IP, adding a second
-route, and a minor security/exposure surface. LanGuard switches Wi-Fi off the moment a wired
-link is active and restores it when the cable's gone.
+macOS keeps Wi-Fi on even when you're docked over Ethernet — wasting an IP lease, adding a
+second default route, and leaving an extra radio exposed. LanGuard switches Wi-Fi **off** the
+instant a wired link is active and switches it back **on** when the cable's gone. It only acts
+on plug/unplug **transitions**, so if you manually flip Wi-Fi back on while docked, it stays on
+until you next unplug.
 
 ## Features
 
-- **Edge-based toggling** — acts only on wired plug/unplug transitions, so a manual Wi-Fi change
-  is respected until the next unplug/replug.
-- **Wake-aware** — a transition that happened while asleep is detected and corrected on wake.
-- **Per-interface config** — choose which wired adapters count as triggers and which Wi-Fi
-  adapters to control. New real adapters are auto-included.
-- **Ignores virtual adapters** — bridge / VPN / VM (e.g. VMware `vmnet`) adapters are off by
-  default, so they can't pin Wi-Fi off forever (opt them in if you want).
-- **Notifications** — optional banner whenever Wi-Fi is toggled.
-- **Configurable menu-bar indicator** — icon only / icon + label / label only (LAN · Wi-Fi · Off).
-- **Master switch** — pause all automatic toggling from the menu.
-- **Start at login** — self-healing login item (auto re-registers if the app moves; prompts
-  if macOS needs approval).
-- **No sudo, no shell** — Wi-Fi power via CoreWLAN, link state via SystemConfiguration.
+| | |
+|---|---|
+| 🔌 **Edge-based** | Acts only on wired plug/unplug transitions — your manual Wi-Fi changes are respected. |
+| 😴 **Wake-aware** | A transition that happened while asleep is detected and corrected on wake. |
+| 🎛️ **Per-interface** | Pick which wired adapters trigger and which Wi-Fi adapters are controlled. |
+| 🧪 **Ignores virtual NICs** | Bridge / VPN / VM adapters (e.g. VMware `vmnet`) are off by default so they can't pin Wi-Fi off. |
+| 🔔 **Notifications** | Optional banner whenever Wi-Fi is toggled. |
+| 🧭 **Configurable indicator** | Menu-bar shows `LAN` / `Wi-Fi` / `Off` — icon only, icon + label, or label only. |
+| ⏸️ **Master switch** | Pause all automatic toggling from the menu. |
+| 🚀 **Start at login** | Self-healing login item — re-registers if the app moves; prompts if macOS needs approval. |
+| 🔐 **No sudo, no shell** | Wi-Fi power via CoreWLAN, link state via SystemConfiguration. |
 
 ## Install
 
-Requires macOS 14+.
+> **Requires macOS 14+.**
+
+### Homebrew
 
 ```bash
-git clone https://github.com/roypadina-reeco/LanGuard.git
-cd LanGuard
-xcodebuild -workspace LanGuard.xcworkspace -scheme LanGuard -configuration Release build
-# copy the built LanGuard.app into /Applications, then launch it
+# (planned) once a tap + signed release are published:
+brew install --cask roypadina/tap/languard
 ```
 
-The app lives in the menu bar (no Dock icon). Click the icon for status, the master toggle,
-and **Settings…**. On first launch, click **Allow** on the notification permission prompt if
-you want toggle banners.
+> Not live yet — see [#brew](https://github.com/roypadina/LanGuard/issues) / the Roadmap.
+
+### Build from source
+
+```bash
+git clone https://github.com/roypadina/LanGuard.git
+cd LanGuard
+xcodebuild -workspace LanGuard.xcworkspace -scheme LanGuard -configuration Release build
+# copy the built LanGuard.app from DerivedData into /Applications, then launch it
+```
+
+The app lives in the menu bar (no Dock icon). On first launch, click **Allow** on the
+notification prompt if you want toggle banners.
+
+## Usage
+
+Click the menu-bar icon for status, the **Auto-toggle** master switch, and **Settings…**.
+
+In **Settings** you can:
+- choose which **wired adapters** count as triggers (real adapters on by default, virtual off),
+- choose which **Wi-Fi adapters** are controlled,
+- toggle **notifications**,
+- pick the **menu-bar icon style**,
+- enable **Start at login**.
 
 ## How it works
 
-| Piece | Role |
+```
+wired link UP   ─▶  Wi-Fi OFF
+wired link DOWN ─▶  Wi-Fi ON
+(no edge)       ─▶  leave Wi-Fi alone   ← respects manual override
+```
+
+| Component | Role |
 |---|---|
-| `NetworkMonitor` | `SCDynamicStore` link/IP callbacks + wake notification |
-| `WiFiController` | CoreWLAN power on/off |
-| `ToggleEngine`   | edge state machine (wired up → off, down → on) |
-| `InterfaceCatalog` | enumerate + classify Ethernet/Wi-Fi, flag virtual adapters |
-| `LoginItem` | SMAppService login item (self-healing) |
+| `NetworkMonitor` | `SCDynamicStore` link/IP callbacks + `NSWorkspace` wake notification |
+| `WiFiController` | CoreWLAN power on/off (no sudo) |
+| `ToggleEngine`   | Edge state machine — dependency-injected, fully unit-tested |
+| `InterfaceCatalog` | Enumerate + classify Ethernet/Wi-Fi; flag virtual adapters |
+| `LoginItem` | `SMAppService` login item (self-healing) |
+| `Notifier` | `UNUserNotificationCenter` banners |
+
+See the [Wiki](https://github.com/roypadina/LanGuard/wiki) for deeper docs and
+[`CLAUDE.md`](CLAUDE.md) for the full component map.
+
+## Roadmap
+
+- [ ] Homebrew cask + notarized release
+- [ ] Failover mode (deprioritize Wi-Fi instead of disabling)
+- [ ] Run actions / scripts on connect / disconnect
+- [ ] VPN auto-connect by network
+- [ ] Per-SSID rules
+
+Have an idea? [Open a feature request.](https://github.com/roypadina/LanGuard/issues/new/choose)
+
+## Contributing
+
+PRs welcome! `main` is protected — fork, branch, add tests, and open a PR. See
+[CONTRIBUTING.md](CONTRIBUTING.md) and the [Code of Conduct](CODE_OF_CONDUCT.md).
+
+```bash
+cd LanGuardPackage && swift test   # pure logic, no hardware needed
+```
+
+## Support
+
+If LanGuard saves you some battery and annoyance, you can
+[**buy me a coffee ☕**](https://buymeacoffee.com/roypadina) — totally optional, always appreciated.
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+[MIT](LICENSE) © Roy Padina

@@ -1,0 +1,39 @@
+name: Bug report
+description: Something isn't working as expected
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What did you expect, and what happened instead?
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Dock over Ethernet
+        2. ...
+    validations:
+      required: true
+  - type: input
+    id: macos
+    attributes:
+      label: macOS version
+      placeholder: "14.5"
+    validations:
+      required: true
+  - type: textarea
+    id: interfaces
+    attributes:
+      label: Network interfaces
+      description: Output of `networksetup -listallhardwareports` (redact anything sensitive).
+      render: shell
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs (optional)
+      description: "`log show --predicate 'process == \"LanGuard\"' --last 10m`"
+      render: shell
