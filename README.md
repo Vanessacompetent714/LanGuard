@@ -18,6 +18,12 @@ and back **on when you unplug** — edge-based, wake-aware, per-interface, and n
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?logo=github)](CONTRIBUTING.md)
 [![Stars](https://img.shields.io/github/stars/roypadina/LanGuard?style=social)](https://github.com/roypadina/LanGuard/stargazers)
 
+<br>
+
+<img src="docs/demo.gif" alt="LanGuard in action: when the wired LAN link goes active the menu-bar indicator flips to LAN and Wi-Fi powers off; when it goes inactive the indicator returns to Wi-Fi and Wi-Fi comes back on." width="720">
+
+<sub><i>Wired link goes up → indicator flips to <b>LAN</b> and Wi-Fi powers off · link goes down → back to <b>Wi-Fi</b>.</i></sub>
+
 </div>
 
 ---
