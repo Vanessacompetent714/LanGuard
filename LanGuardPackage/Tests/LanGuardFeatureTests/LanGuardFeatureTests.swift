@@ -1,4 +1,5 @@
 import Testing
+import ServiceManagement
 @testable import LanGuardFeature
 
 /// Mutable test environment backing ToggleEngine's injected dependencies.
@@ -64,4 +65,31 @@ private final class Env {
     let engine = env.engine()           // loads prev = true
     engine.reapply()                    // clears edge memory, re-enforces
     #expect(env.calls.map(\.on) == [false])
+}
+
+// MARK: - Login-item registration decision
+
+@Test func login_notRegistered_registers() {
+    #expect(LoginItem.decide(status: .notRegistered, storedPath: nil, currentPath: "/A") == .register)
+}
+
+@Test func login_notFound_reRegisters() {
+    #expect(LoginItem.decide(status: .notFound, storedPath: "/A", currentPath: "/A") == .reRegisterMoved)
+}
+
+@Test func login_enabledSamePath_none() {
+    #expect(LoginItem.decide(status: .enabled, storedPath: "/A", currentPath: "/A") == .none)
+}
+
+@Test func login_enabledNoStoredPath_none() {
+    // Already enabled, first time recording the path → adopt, don't re-register.
+    #expect(LoginItem.decide(status: .enabled, storedPath: nil, currentPath: "/A") == .none)
+}
+
+@Test func login_movedWhileEnabled_reRegisters() {
+    #expect(LoginItem.decide(status: .enabled, storedPath: "/A", currentPath: "/B") == .reRegisterMoved)
+}
+
+@Test func login_movedWhileApprovalPending_reRegisters() {
+    #expect(LoginItem.decide(status: .requiresApproval, storedPath: "/A", currentPath: "/B") == .reRegisterMoved)
 }

@@ -13,7 +13,6 @@ public final class AppModel: ObservableObject {
     public let engine: ToggleEngine
 
     private var bag = Set<AnyCancellable>()
-    private let defaults = UserDefaults.standard
 
     public init() {
         let settings = AppSettings()
@@ -65,10 +64,13 @@ public final class AppModel: ObservableObject {
     public func start() {
         LegacyCleanup.run()
 
-        // First run: honour the user's "autostart" choice.
-        if !defaults.bool(forKey: "didInitialSetup") {
-            LoginItem.setEnabled(true)
-            defaults.set(true, forKey: "didInitialSetup")
+        // Auto-register the login item for the current bundle path every launch.
+        // Self-heals after a move; prompts the user if macOS needs approval.
+        switch LoginItem.ensureRegistered() {
+        case .reRegisterMoved:
+            LoginItem.notifyReRegisteredAfterMove()
+        case .register, .none:
+            LoginItem.promptForApprovalIfNeeded()
         }
 
         monitor.onChange = { [weak self] in self?.engine.evaluate() }

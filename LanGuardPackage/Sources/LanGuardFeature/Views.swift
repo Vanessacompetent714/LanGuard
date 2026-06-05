@@ -55,11 +55,17 @@ public struct ConfigView: View {
             ))
             .font(.headline)
 
-            Toggle("Start at login", isOn: $loginOn)
-                .onChange(of: loginOn) { _, newValue in
-                    LoginItem.setEnabled(newValue)
-                    loginOn = LoginItem.isEnabled
-                }
+            VStack(alignment: .leading, spacing: 2) {
+                Toggle("Start at login", isOn: $loginOn)
+                    .onChange(of: loginOn) { _, newValue in
+                        LoginItem.setEnabled(newValue)
+                        if newValue { LoginItem.promptForApprovalIfNeeded() }
+                        loginOn = LoginItem.isEnabled
+                    }
+                Text("Login item: \(LoginItem.statusDescription)")
+                    .font(.caption)
+                    .foregroundStyle(LoginItem.status == .requiresApproval ? Color.orange : .secondary)
+            }
 
             Divider()
 

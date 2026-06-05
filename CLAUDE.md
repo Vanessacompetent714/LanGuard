@@ -35,8 +35,16 @@ cp -R "$(built .app)" /Applications/LanGuard.app && open /Applications/LanGuard.
 ```
 Min macOS 14. Swift 5 language mode (avoids Swift 6 strict-concurrency friction).
 
+## Login item (self-healing)
+`LoginItem.ensureRegistered()` runs every launch (`AppModel.start`). It registers the
+login item for the **current** bundle path, records it in the `registeredBundlePath`
+UserDefault, and auto re-registers if the path changes (app moved/rebuilt-into-/Applications)
+or the registration is lost (`.notFound`). On a detected move it re-registers and shows an
+info alert; if macOS marks the item `.requiresApproval`, it prompts and opens Login Items
+settings. Pure decision in `LoginItem.decide(status:storedPath:currentPath:)` (unit-tested).
+Just `cp -R` a new build over `/Applications/LanGuard.app` and relaunch — no manual defaults
+surgery needed.
+
 ## Gotchas
-- Login item registers the **running bundle's path** — install to `/Applications` before
-  relying on autostart. First-run setup is guarded by the `didInitialSetup` UserDefault;
-  `defaults delete com.roy.languard didInitialSetup` to re-run it (e.g. after moving the app).
 - `lastWired` UserDefault is the edge memory; delete it to force fresh enforcement.
+- `registeredBundlePath` UserDefault tracks where the login item is registered from.
