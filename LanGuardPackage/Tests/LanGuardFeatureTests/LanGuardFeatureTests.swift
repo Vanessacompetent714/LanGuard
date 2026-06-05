@@ -1,4 +1,4 @@
-import Testing
+import XCTest
 import ServiceManagement
 @testable import LanGuardFeature
 
@@ -22,118 +22,124 @@ private final class Env {
     }
 }
 
-@Test func firstRun_wiredUp_turnsWiFiOff() {
-    let env = Env(); env.stored = nil; env.wiredActive = ["en8"]
-    env.engine().evaluate()
-    #expect(env.calls.count == 1)
-    #expect(env.calls.first?.on == false)
+final class ToggleEngineTests: XCTestCase {
+
+    func test_firstRun_wiredUp_turnsWiFiOff() {
+        let env = Env(); env.stored = nil; env.wiredActive = ["en8"]
+        env.engine().evaluate()
+        XCTAssertEqual(env.calls.count, 1)
+        XCTAssertEqual(env.calls.first?.on, false)
+    }
+
+    func test_firstRun_wiredDown_leavesWiFiAlone() {
+        let env = Env(); env.stored = nil; env.wiredActive = []
+        env.engine().evaluate()
+        XCTAssertTrue(env.calls.isEmpty)
+    }
+
+    func test_edgeUp_turnsWiFiOff() {
+        let env = Env(); env.stored = false; env.wiredActive = ["en8"]
+        env.engine().evaluate()
+        XCTAssertEqual(env.calls.map(\.on), [false])
+    }
+
+    func test_edgeDown_turnsWiFiOn() {
+        let env = Env(); env.stored = true; env.wiredActive = []
+        env.engine().evaluate()
+        XCTAssertEqual(env.calls.map(\.on), [true])
+    }
+
+    func test_noEdge_respectsManualOverride() {
+        // Wired stayed up; user manually re-enabled Wi-Fi. App must not touch it.
+        let env = Env(); env.stored = true; env.wiredActive = ["en8"]
+        env.engine().evaluate()
+        XCTAssertTrue(env.calls.isEmpty)
+    }
+
+    func test_autoDisabled_neverTouchesWiFi() {
+        let env = Env(); env.auto = false; env.stored = false; env.wiredActive = ["en8"]
+        env.engine().evaluate()
+        XCTAssertTrue(env.calls.isEmpty)
+    }
+
+    func test_reapply_enforcesAfresh() {
+        let env = Env(); env.stored = true; env.wiredActive = ["en8"]
+        let engine = env.engine()   // loads prev = true
+        engine.reapply()            // clears edge memory, re-enforces
+        XCTAssertEqual(env.calls.map(\.on), [false])
+    }
 }
 
-@Test func firstRun_wiredDown_leavesWiFiAlone() {
-    let env = Env(); env.stored = nil; env.wiredActive = []
-    env.engine().evaluate()
-    #expect(env.calls.isEmpty)
+final class LoginItemTests: XCTestCase {
+
+    func test_notRegistered_registers() {
+        XCTAssertEqual(LoginItem.decide(status: .notRegistered, storedPath: nil, currentPath: "/A"), .register)
+    }
+
+    func test_notFound_reRegisters() {
+        XCTAssertEqual(LoginItem.decide(status: .notFound, storedPath: "/A", currentPath: "/A"), .reRegisterMoved)
+    }
+
+    func test_enabledSamePath_none() {
+        XCTAssertEqual(LoginItem.decide(status: .enabled, storedPath: "/A", currentPath: "/A"), .none)
+    }
+
+    func test_enabledNoStoredPath_none() {
+        XCTAssertEqual(LoginItem.decide(status: .enabled, storedPath: nil, currentPath: "/A"), .none)
+    }
+
+    func test_movedWhileEnabled_reRegisters() {
+        XCTAssertEqual(LoginItem.decide(status: .enabled, storedPath: "/A", currentPath: "/B"), .reRegisterMoved)
+    }
+
+    func test_movedWhileApprovalPending_reRegisters() {
+        XCTAssertEqual(LoginItem.decide(status: .requiresApproval, storedPath: "/A", currentPath: "/B"), .reRegisterMoved)
+    }
 }
 
-@Test func edgeUp_turnsWiFiOff() {
-    let env = Env(); env.stored = false; env.wiredActive = ["en8"]
-    env.engine().evaluate()
-    #expect(env.calls.map(\.on) == [false])
+final class InterfaceCatalogTests: XCTestCase {
+
+    func test_virtual_flagsBridgeVpnVm() {
+        XCTAssertTrue(InterfaceCatalog.isVirtual(bsdName: "bridge0", displayName: "Thunderbolt Bridge"))
+        XCTAssertTrue(InterfaceCatalog.isVirtual(bsdName: "vmnet8", displayName: "vmnet8"))
+        XCTAssertTrue(InterfaceCatalog.isVirtual(bsdName: "utun4", displayName: "utun4"))
+        XCTAssertTrue(InterfaceCatalog.isVirtual(bsdName: "en5", displayName: "Parallels Adapter"))
+        XCTAssertTrue(InterfaceCatalog.isVirtual(bsdName: "vboxnet0", displayName: "VirtualBox Host-Only"))
+    }
+
+    func test_virtual_keepsRealAdaptersPhysical() {
+        XCTAssertFalse(InterfaceCatalog.isVirtual(bsdName: "en8", displayName: "Realtek USB LAN"))
+        XCTAssertFalse(InterfaceCatalog.isVirtual(bsdName: "en1", displayName: "Thunderbolt 1"))
+        XCTAssertFalse(InterfaceCatalog.isVirtual(bsdName: "en0", displayName: "Ethernet"))
+    }
 }
 
-@Test func edgeDown_turnsWiFiOn() {
-    let env = Env(); env.stored = true; env.wiredActive = []
-    env.engine().evaluate()
-    #expect(env.calls.map(\.on) == [true])
+final class MenuStateTests: XCTestCase {
+
+    func test_mapping() {
+        XCTAssertEqual(MenuState.from(autoEnabled: false, wiredUp: true), .paused)
+        XCTAssertEqual(MenuState.from(autoEnabled: false, wiredUp: false), .paused)
+        XCTAssertEqual(MenuState.from(autoEnabled: true, wiredUp: true), .lan)
+        XCTAssertEqual(MenuState.from(autoEnabled: true, wiredUp: false), .wifi)
+    }
 }
 
-@Test func noEdge_respectsManualOverride() {
-    // Wired stayed up; user manually re-enabled Wi-Fi. App must not touch it.
-    let env = Env(); env.stored = true; env.wiredActive = ["en8"]
-    env.engine().evaluate()
-    #expect(env.calls.isEmpty)
-}
+final class AppSettingsTests: XCTestCase {
 
-@Test func autoDisabled_neverTouchesWiFi() {
-    let env = Env(); env.auto = false; env.stored = false; env.wiredActive = ["en8"]
-    env.engine().evaluate()
-    #expect(env.calls.isEmpty)
-}
+    func test_physicalOptOut_virtualOptIn() {
+        let defaults = UserDefaults(suiteName: "lg-test-\(UUID().uuidString)")!
+        let settings = AppSettings(defaults: defaults)
+        let phys = NetInterface(bsdName: "en8", displayName: "Realtek USB LAN", isWiFi: false, isVirtual: false)
+        let virt = NetInterface(bsdName: "bridge0", displayName: "Thunderbolt Bridge", isWiFi: false, isVirtual: true)
 
-@Test func reapply_enforcesAfresh() {
-    let env = Env(); env.stored = true; env.wiredActive = ["en8"]
-    let engine = env.engine()           // loads prev = true
-    engine.reapply()                    // clears edge memory, re-enforces
-    #expect(env.calls.map(\.on) == [false])
-}
+        // Defaults: physical on, virtual off.
+        XCTAssertTrue(settings.wiredEnabled(phys))
+        XCTAssertFalse(settings.wiredEnabled(virt))
 
-// MARK: - Login-item registration decision
-
-@Test func login_notRegistered_registers() {
-    #expect(LoginItem.decide(status: .notRegistered, storedPath: nil, currentPath: "/A") == .register)
-}
-
-@Test func login_notFound_reRegisters() {
-    #expect(LoginItem.decide(status: .notFound, storedPath: "/A", currentPath: "/A") == .reRegisterMoved)
-}
-
-@Test func login_enabledSamePath_none() {
-    #expect(LoginItem.decide(status: .enabled, storedPath: "/A", currentPath: "/A") == .none)
-}
-
-@Test func login_enabledNoStoredPath_none() {
-    // Already enabled, first time recording the path → adopt, don't re-register.
-    #expect(LoginItem.decide(status: .enabled, storedPath: nil, currentPath: "/A") == .none)
-}
-
-@Test func login_movedWhileEnabled_reRegisters() {
-    #expect(LoginItem.decide(status: .enabled, storedPath: "/A", currentPath: "/B") == .reRegisterMoved)
-}
-
-@Test func login_movedWhileApprovalPending_reRegisters() {
-    #expect(LoginItem.decide(status: .requiresApproval, storedPath: "/A", currentPath: "/B") == .reRegisterMoved)
-}
-
-// MARK: - Virtual-adapter detection
-
-@Test func virtual_flagsBridgeVpnVm() {
-    #expect(InterfaceCatalog.isVirtual(bsdName: "bridge0", displayName: "Thunderbolt Bridge"))
-    #expect(InterfaceCatalog.isVirtual(bsdName: "vmnet8", displayName: "vmnet8"))
-    #expect(InterfaceCatalog.isVirtual(bsdName: "utun4", displayName: "utun4"))
-    #expect(InterfaceCatalog.isVirtual(bsdName: "en5", displayName: "Parallels Adapter"))
-    #expect(InterfaceCatalog.isVirtual(bsdName: "vboxnet0", displayName: "VirtualBox Host-Only"))
-}
-
-@Test func virtual_keepsRealAdaptersPhysical() {
-    #expect(!InterfaceCatalog.isVirtual(bsdName: "en8", displayName: "Realtek USB LAN"))
-    #expect(!InterfaceCatalog.isVirtual(bsdName: "en1", displayName: "Thunderbolt 1"))
-    #expect(!InterfaceCatalog.isVirtual(bsdName: "en0", displayName: "Ethernet"))
-}
-
-// MARK: - Menu-bar icon state
-
-@Test func menuState_mapping() {
-    #expect(MenuState.from(autoEnabled: false, wiredUp: true)  == .paused)
-    #expect(MenuState.from(autoEnabled: false, wiredUp: false) == .paused)
-    #expect(MenuState.from(autoEnabled: true,  wiredUp: true)  == .lan)
-    #expect(MenuState.from(autoEnabled: true,  wiredUp: false) == .wifi)
-}
-
-// MARK: - Settings: virtual opt-in vs physical opt-out
-
-@Test func settings_physicalOptOut_virtualOptIn() {
-    let defaults = UserDefaults(suiteName: "lg-test-\(UUID().uuidString)")!
-    let settings = AppSettings(defaults: defaults)
-    let phys = NetInterface(bsdName: "en8", displayName: "Realtek USB LAN", isWiFi: false, isVirtual: false)
-    let virt = NetInterface(bsdName: "bridge0", displayName: "Thunderbolt Bridge", isWiFi: false, isVirtual: true)
-
-    // Defaults: physical on, virtual off.
-    #expect(settings.wiredEnabled(phys) == true)
-    #expect(settings.wiredEnabled(virt) == false)
-
-    // User can opt a virtual adapter in, and opt a physical one out.
-    settings.setWiredEnabled(virt, true)
-    settings.setWiredEnabled(phys, false)
-    #expect(settings.wiredEnabled(virt) == true)
-    #expect(settings.wiredEnabled(phys) == false)
+        // User can opt a virtual adapter in, and opt a physical one out.
+        settings.setWiredEnabled(virt, true)
+        settings.setWiredEnabled(phys, false)
+        XCTAssertTrue(settings.wiredEnabled(virt))
+        XCTAssertFalse(settings.wiredEnabled(phys))
+    }
 }
