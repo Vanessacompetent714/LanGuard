@@ -28,7 +28,6 @@ and back **on when you unplug** — wake-aware, per-interface, no admin rights, 
 - [Install](#install)
 - [Usage](#usage)
 - [How it works](#how-it-works)
-- [Roadmap](#roadmap)
 - [Contributing](#contributing)
 - [Support](#support)
 - [License](#license)
@@ -110,16 +109,6 @@ wired link DOWN ─▶  Wi-Fi ON
 
 See the [Wiki](https://github.com/roypadina/LanGuard/wiki) for deeper docs and
 [`CLAUDE.md`](CLAUDE.md) for the full component map.
-
-## Roadmap
-
-- [ ] Homebrew cask + notarized release
-- [ ] Failover mode (deprioritize Wi-Fi instead of disabling)
-- [ ] Run actions / scripts on connect / disconnect
-- [ ] VPN auto-connect by network
-- [ ] Per-SSID rules
-
-Have an idea? [Open a feature request.](https://github.com/roypadina/LanGuard/issues/new/choose)
 
 ## Contributing
 
