@@ -133,7 +133,8 @@ cd LanGuardPackage && swift test   # pure logic, no hardware needed
 ## Support
 
 If LanGuard saves you some battery and annoyance, you can
-[**buy me a coffee ☕**](https://buymeacoffee.com/roypadina) — totally optional, always appreciated.
+[**buy me a coffee on Ko-fi ☕**](https://ko-fi.com/roypadina) or
+[**sponsor me on GitHub**](https://github.com/sponsors/roypadina) — totally optional, always appreciated.
 
 ## License
 
