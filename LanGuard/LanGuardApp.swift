@@ -16,7 +16,7 @@ struct LanGuardApp: App {
         MenuBarExtra {
             MenuContent(model: model)
         } label: {
-            Image(systemName: model.menuSymbol)
+            MenuBarLabel(model: model)
         }
         .menuBarExtraStyle(.menu)
 

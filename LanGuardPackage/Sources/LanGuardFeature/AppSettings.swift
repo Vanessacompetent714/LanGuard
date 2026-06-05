@@ -19,6 +19,10 @@ public final class AppSettings: ObservableObject {
         didSet { defaults.set(notificationsEnabled, forKey: Keys.notificationsEnabled) }
     }
 
+    @Published public var menuIconStyle: MenuIconStyle {
+        didSet { defaults.set(menuIconStyle.rawValue, forKey: Keys.menuIconStyle) }
+    }
+
     /// Physical wired BSD names that are NOT used as triggers (opt-out).
     @Published public var disabledWired: Set<String> {
         didSet { defaults.set(Array(disabledWired), forKey: Keys.disabledWired) }
@@ -38,6 +42,7 @@ public final class AppSettings: ObservableObject {
         self.defaults = defaults
         self.autoEnabled = (defaults.object(forKey: Keys.autoEnabled) as? Bool) ?? true
         self.notificationsEnabled = (defaults.object(forKey: Keys.notificationsEnabled) as? Bool) ?? true
+        self.menuIconStyle = MenuIconStyle(rawValue: defaults.string(forKey: Keys.menuIconStyle) ?? "") ?? .symbol
         self.disabledWired = Set(defaults.stringArray(forKey: Keys.disabledWired) ?? [])
         self.enabledVirtual = Set(defaults.stringArray(forKey: Keys.enabledVirtual) ?? [])
         self.disabledWiFi = Set(defaults.stringArray(forKey: Keys.disabledWiFi) ?? [])
@@ -66,6 +71,7 @@ public final class AppSettings: ObservableObject {
     private enum Keys {
         static let autoEnabled = "autoEnabled"
         static let notificationsEnabled = "notificationsEnabled"
+        static let menuIconStyle = "menuIconStyle"
         static let disabledWired = "disabledWired"
         static let enabledVirtual = "enabledVirtual"
         static let disabledWiFi = "disabledWiFi"

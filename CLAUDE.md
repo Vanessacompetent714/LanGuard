@@ -11,8 +11,9 @@ on first launch).
   - `NetworkMonitor` — `SCDynamicStore` callbacks (link/IPv4) + `NSWorkspace.didWakeNotification`; per-interface link reads (SC `kSCPropNetLinkActive`, ifconfig fallback).
   - `WiFiController` — CoreWLAN `setPower` / `powerOn` (no sudo, no shell).
   - `Notifier` — `UNUserNotificationCenter` wrapper; banners on Wi-Fi toggle (needs OS permission, requested on launch).
+  - `MenuIcon` — `MenuState` (lan/wifi/paused, pure mapping) + `MenuIconStyle` (icon / icon+label / label) + `MenuBarLabel` view used as the MenuBarExtra label.
   - `ToggleEngine` — **edge-based** decision logic, dependencies injected → testable.
-  - `AppSettings` — UserDefaults. Physical wired + Wi-Fi = **opt-out** (`disabledWired`/`disabledWiFi`); virtual wired = **opt-in** (`enabledVirtual`, off by default). `notificationsEnabled`.
+  - `AppSettings` — UserDefaults. Physical wired + Wi-Fi = **opt-out** (`disabledWired`/`disabledWiFi`); virtual wired = **opt-in** (`enabledVirtual`, off by default). `notificationsEnabled`, `menuIconStyle`.
   - `LoginItem` / `LegacyCleanup` — SMAppService login item (self-healing, see below); removes legacy LaunchAgent.
   - `AppModel` — wires everything; singleton `AppModel.shared`. `setWiFiPower` posts the toggle notification.
   - `Views` — `MenuContent` (menu), `ConfigView` (settings window; virtual adapters get a "virtual" badge).

@@ -110,6 +110,15 @@ private final class Env {
     #expect(!InterfaceCatalog.isVirtual(bsdName: "en0", displayName: "Ethernet"))
 }
 
+// MARK: - Menu-bar icon state
+
+@Test func menuState_mapping() {
+    #expect(MenuState.from(autoEnabled: false, wiredUp: true)  == .paused)
+    #expect(MenuState.from(autoEnabled: false, wiredUp: false) == .paused)
+    #expect(MenuState.from(autoEnabled: true,  wiredUp: true)  == .lan)
+    #expect(MenuState.from(autoEnabled: true,  wiredUp: false) == .wifi)
+}
+
 // MARK: - Settings: virtual opt-in vs physical opt-out
 
 @Test func settings_physicalOptOut_virtualOptIn() {

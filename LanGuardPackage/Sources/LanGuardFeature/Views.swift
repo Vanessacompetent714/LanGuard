@@ -72,6 +72,16 @@ public struct ConfigView: View {
                 set: { model.settings.notificationsEnabled = $0 }
             ))
 
+            Picker("Menu bar icon", selection: Binding(
+                get: { model.settings.menuIconStyle },
+                set: { model.settings.menuIconStyle = $0 }
+            )) {
+                ForEach(MenuIconStyle.allCases) { style in
+                    Text(style.title).tag(style)
+                }
+            }
+            .pickerStyle(.segmented)
+
             Divider()
 
             section(

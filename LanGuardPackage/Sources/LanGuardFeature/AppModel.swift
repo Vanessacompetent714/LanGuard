@@ -107,10 +107,9 @@ public final class AppModel: ObservableObject {
     public func linkActive(_ bsd: String) -> Bool { monitor.linkActive(bsd) }
     public func wifiPoweredOn(_ bsd: String) -> Bool { WiFiController.isPoweredOn(bsd) }
 
-    /// SF Symbol for the menu-bar icon, reflecting current state.
-    public var menuSymbol: String {
-        if !settings.autoEnabled { return "pause.circle" }
-        return engine.wiredUp ? "cable.connector" : "wifi"
+    /// Current state shown in the menu bar (LAN / Wi-Fi / paused).
+    public var menuState: MenuState {
+        MenuState.from(autoEnabled: settings.autoEnabled, wiredUp: engine.wiredUp)
     }
 
     public var statusLine: String {
