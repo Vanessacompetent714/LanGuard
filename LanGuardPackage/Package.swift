@@ -1,5 +1,7 @@
-// swift-tools-version: 6.1
+// swift-tools-version: 5.9
 // The swift-tools-version declares the minimum version of Swift required to build this package.
+// 5.9 keeps the default Swift-5 language mode (no Swift-6 strict concurrency) and builds on
+// the stock Xcode shipped with macOS 14 CI runners.
 
 import PackageDescription
 
@@ -13,18 +15,10 @@ let package = Package(
         ),
     ],
     targets: [
-        .target(
-            name: "LanGuardFeature",
-            // Swift 5 language mode — avoids Swift 6 strict-concurrency friction
-            // with C callbacks (SCDynamicStore), AppKit observers, ObservableObject.
-            swiftSettings: [.swiftLanguageMode(.v5)]
-        ),
+        .target(name: "LanGuardFeature"),
         .testTarget(
             name: "LanGuardFeatureTests",
-            dependencies: [
-                "LanGuardFeature"
-            ],
-            swiftSettings: [.swiftLanguageMode(.v5)]
+            dependencies: ["LanGuardFeature"]
         ),
     ]
 )
