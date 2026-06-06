@@ -69,7 +69,7 @@ manually flip Wi-Fi back on while docked, it stays on until you next unplug.
 >
 > ![LanGuard menu-bar indicator showing "LAN" while a wired link is active](docs/screenshots/menubar.png)
 >
-> _More screenshots (open menu, Settings) and a demo GIF are on the way — contributions welcome._
+> _An open-menu screenshot is still welcome — see [#1](https://github.com/roypadina/LanGuard/issues/1)._
 
 ## How LanGuard compares
 
@@ -124,6 +124,12 @@ In **Settings** you can:
 - toggle **notifications**,
 - pick the **menu-bar icon style** (icon / icon + label / label),
 - enable **Start at login**.
+
+<div align="center">
+
+<img src="docs/screenshots/settings.png" alt="LanGuard Settings: Auto-toggle, Start at login, notifications, menu-bar icon style, per-interface Wired triggers (with the active link dotted green) and Controlled Wi-Fi adapters." width="380">
+
+</div>
 
 ## How it works
 
