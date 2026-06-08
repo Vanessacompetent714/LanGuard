@@ -62,14 +62,17 @@ public final class NetworkMonitor {
         // still caught — the settled post-wake state reads as a real edge.
         let nc = NSWorkspace.shared.notificationCenter
         nc.addObserver(forName: NSWorkspace.willSleepNotification, object: nil, queue: .main) { [weak self] _ in
+            Log.write("willSleep → suspend (ignore link changes while asleep)")
             self?.suspended = true
             self?.pendingEvaluate?.cancel()
         }
         nc.addObserver(forName: NSWorkspace.didWakeNotification, object: nil, queue: .main) { [weak self] _ in
             guard let self = self else { return }
+            Log.write("didWake → settle \(self.wakeSettleInterval)s, then evaluate once")
             // Stay suspended through the post-wake network churn, then resume + evaluate once.
             DispatchQueue.main.asyncAfter(deadline: .now() + self.wakeSettleInterval) { [weak self] in
                 guard let self = self else { return }
+                Log.write("wake settle done → resume + evaluate")
                 self.suspended = false
                 self.pendingEvaluate?.cancel()
                 self.onChange()
@@ -80,7 +83,11 @@ public final class NetworkMonitor {
     /// A raw SCDynamicStore change. Dropped while asleep; otherwise debounced so a
     /// burst of key changes (or a brief link flap) collapses into a single evaluate.
     private func networkChanged() {
-        guard !suspended else { return }
+        guard !suspended else {
+            Log.write("net-change ignored (asleep)")
+            return
+        }
+        Log.write("net-change → debounce \(debounceInterval)s")
         pendingEvaluate?.cancel()
         let work = DispatchWorkItem { [weak self] in self?.onChange() }
         pendingEvaluate = work

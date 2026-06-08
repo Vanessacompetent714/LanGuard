@@ -36,6 +36,7 @@ public final class AppModel: ObservableObject {
                 // Only touch interfaces whose power actually differs, and only
                 // notify if something really changed — no redundant banners.
                 let toChange = names.filter { WiFiController.isPoweredOn($0) != on }
+                Log.write("setWiFiPower(on: \(on)) targets=\(names) changing=\(toChange)")
                 guard !toChange.isEmpty else { return }
                 WiFiController.setPower(on, interfaces: toChange)
                 guard settings.notificationsEnabled else { return }
@@ -79,6 +80,8 @@ public final class AppModel: ObservableObject {
 
     /// Called once at launch.
     public func start() {
+        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "?"
+        Log.write("=== LanGuard \(version) start (debug logging on) ===")
         LegacyCleanup.run()
         Notifier.requestAuthorization()
 

@@ -38,6 +38,12 @@ public final class AppSettings: ObservableObject {
         didSet { defaults.set(Array(disabledWiFi), forKey: Keys.disabledWiFi) }
     }
 
+    /// Write a diagnostic log to ~/Library/Logs/LanGuard (off by default).
+    /// Key must match `Log.enabledKey`.
+    @Published public var debugLoggingEnabled: Bool {
+        didSet { defaults.set(debugLoggingEnabled, forKey: Keys.debugLoggingEnabled) }
+    }
+
     public init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
         self.autoEnabled = (defaults.object(forKey: Keys.autoEnabled) as? Bool) ?? true
@@ -46,6 +52,7 @@ public final class AppSettings: ObservableObject {
         self.disabledWired = Set(defaults.stringArray(forKey: Keys.disabledWired) ?? [])
         self.enabledVirtual = Set(defaults.stringArray(forKey: Keys.enabledVirtual) ?? [])
         self.disabledWiFi = Set(defaults.stringArray(forKey: Keys.disabledWiFi) ?? [])
+        self.debugLoggingEnabled = defaults.bool(forKey: Keys.debugLoggingEnabled)
     }
 
     /// Is this wired interface an active trigger? Virtual → opt-in, physical → opt-out.
@@ -75,5 +82,6 @@ public final class AppSettings: ObservableObject {
         static let disabledWired = "disabledWired"
         static let enabledVirtual = "enabledVirtual"
         static let disabledWiFi = "disabledWiFi"
+        static let debugLoggingEnabled = "debugLoggingEnabled"
     }
 }

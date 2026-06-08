@@ -68,14 +68,19 @@ public final class ToggleEngine: ObservableObject {
         let active = deps.activeWiredNames()
         let wired = !active.isEmpty
         let prev = lastWired
+        Log.write("evaluate: wired=\(wired) prev=\(prev.map { $0 ? "true" : "false" } ?? "nil") active=\(active) auto=\(deps.autoEnabled())")
 
         if deps.autoEnabled() {
             let targets = deps.wifiTargets()
             if prev == nil {
                 // First evaluation since (re)start/reapply: enforce only the
                 // "wired up → Wi-Fi off" case. If no wired, leave Wi-Fi alone.
-                if wired { deps.setWiFiPower(false, targets) }
+                if wired {
+                    Log.write("  first-eval wired-up → Wi-Fi OFF \(targets)")
+                    deps.setWiFiPower(false, targets)
+                }
             } else if wired != prev {
+                Log.write("  EDGE wired \(prev == true ? "true→false" : "false→true") → set Wi-Fi \(!wired ? "ON" : "OFF") \(targets)")
                 deps.setWiFiPower(/* on: */ !wired, targets)
             }
         }

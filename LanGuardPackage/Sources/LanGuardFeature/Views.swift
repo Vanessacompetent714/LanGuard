@@ -109,6 +109,25 @@ public struct ConfigView: View {
                     model.selectionChanged()
                 }
             )
+
+            Divider()
+
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Debug").font(.headline)
+                Toggle("Enable debug logging", isOn: Binding(
+                    get: { model.settings.debugLoggingEnabled },
+                    set: {
+                        model.settings.debugLoggingEnabled = $0
+                        if $0 { Log.write("--- debug logging enabled from Settings ---") }
+                    }
+                ))
+                Text("Writes a log to ~/Library/Logs/LanGuard. Turn this on, reproduce the issue, then send us the log file.")
+                    .font(.caption).foregroundStyle(.secondary)
+                HStack {
+                    Button("Reveal Logs in Finder") { Log.revealInFinder() }
+                    Button("Clear Logs") { Log.clear() }
+                }
+            }
         }
         .padding(20)
         .frame(width: 440)
