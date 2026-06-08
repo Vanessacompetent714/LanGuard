@@ -11,6 +11,18 @@ public final class NetworkMonitor {
 
     private var store: SCDynamicStore?
 
+    /// Coalesce bursts of SCDynamicStore callbacks and absorb transient link
+    /// flaps (a USB/Thunderbolt dock's Ethernet drops briefly on display sleep).
+    /// A real plug/unplug still settles within the debounce window.
+    private var pendingEvaluate: DispatchWorkItem?
+    private let debounceInterval: TimeInterval = 1.5
+
+    /// While the machine is asleep we ignore link changes entirely: the dock
+    /// powers its Ethernet down on sleep and back up on wake, which otherwise
+    /// looks like an unplug→replug and spams toggles/notifications.
+    private var suspended = false
+    private let wakeSettleInterval: TimeInterval = 4.0
+
     public init() {}
 
     public func start() {
@@ -22,7 +34,7 @@ public final class NetworkMonitor {
         let callback: SCDynamicStoreCallBack = { _, _, info in
             guard let info = info else { return }
             let monitor = Unmanaged<NetworkMonitor>.fromOpaque(info).takeUnretainedValue()
-            DispatchQueue.main.async { monitor.onChange() }
+            DispatchQueue.main.async { monitor.networkChanged() }
         }
 
         guard let store = SCDynamicStoreCreate(nil, "com.roy.languard" as CFString, callback, &ctx) else {
@@ -43,12 +55,36 @@ public final class NetworkMonitor {
             CFRunLoopAddSource(CFRunLoopGetMain(), src, .commonModes)
         }
 
-        // Re-evaluate on wake — covers "WiFi got toggled while asleep" case.
-        NSWorkspace.shared.notificationCenter.addObserver(
-            forName: NSWorkspace.didWakeNotification, object: nil, queue: .main
-        ) { [weak self] _ in
-            self?.onChange()
+        // Sleep/wake handling. A docked Mac's Ethernet link drops on sleep and
+        // returns on wake; acting on those fires spurious toggles + notifications.
+        // So: ignore link changes while asleep, and after wake wait for the
+        // network to settle, then evaluate once. A genuine undock-while-asleep is
+        // still caught — the settled post-wake state reads as a real edge.
+        let nc = NSWorkspace.shared.notificationCenter
+        nc.addObserver(forName: NSWorkspace.willSleepNotification, object: nil, queue: .main) { [weak self] _ in
+            self?.suspended = true
+            self?.pendingEvaluate?.cancel()
         }
+        nc.addObserver(forName: NSWorkspace.didWakeNotification, object: nil, queue: .main) { [weak self] _ in
+            guard let self = self else { return }
+            // Stay suspended through the post-wake network churn, then resume + evaluate once.
+            DispatchQueue.main.asyncAfter(deadline: .now() + self.wakeSettleInterval) { [weak self] in
+                guard let self = self else { return }
+                self.suspended = false
+                self.pendingEvaluate?.cancel()
+                self.onChange()
+            }
+        }
+    }
+
+    /// A raw SCDynamicStore change. Dropped while asleep; otherwise debounced so a
+    /// burst of key changes (or a brief link flap) collapses into a single evaluate.
+    private func networkChanged() {
+        guard !suspended else { return }
+        pendingEvaluate?.cancel()
+        let work = DispatchWorkItem { [weak self] in self?.onChange() }
+        pendingEvaluate = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + debounceInterval, execute: work)
     }
 
     /// True if the interface currently has an active physical link.

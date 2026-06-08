@@ -33,7 +33,11 @@ public final class AppModel: ObservableObject {
                     .filter { settings.wifiEnabled($0) }
             },
             setWiFiPower: { on, names in
-                WiFiController.setPower(on, interfaces: names)
+                // Only touch interfaces whose power actually differs, and only
+                // notify if something really changed — no redundant banners.
+                let toChange = names.filter { WiFiController.isPoweredOn($0) != on }
+                guard !toChange.isEmpty else { return }
+                WiFiController.setPower(on, interfaces: toChange)
                 guard settings.notificationsEnabled else { return }
                 if on {
                     Notifier.post(title: "Wi-Fi on",
