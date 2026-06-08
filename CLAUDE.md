@@ -11,6 +11,7 @@ on first launch).
   - `NetworkMonitor` — `SCDynamicStore` callbacks (link/IPv4) + `NSWorkspace` sleep/wake; per-interface link reads (SC `kSCPropNetLinkActive`, ifconfig fallback). **Flap guard:** ignores link changes while asleep (`willSleepNotification` → `suspended`), waits a settle interval after `didWakeNotification` before evaluating once, and debounces callback bursts/brief flaps (1.5s). Stops a docked Mac's Ethernet dropping on sleep + returning on wake from looking like a real unplug→replug.
   - `WiFiController` — CoreWLAN `setPower` / `powerOn` (no sudo, no shell).
   - `Notifier` — `UNUserNotificationCenter` wrapper; banners on Wi-Fi toggle (needs OS permission, requested on launch).
+  - `Log` — opt-in file logger. When `debugLoggingEnabled` (Settings → Debug) is on, appends timestamped events to `~/Library/Logs/LanGuard/languard.log` (rotates at ~1MB, one backup). `Log.write` is a no-op while off. `revealInFinder()` / `clear()` back the Settings buttons. Instrumented across start / evaluate / edges / setWiFiPower / sleep-wake so users can capture + send a log.
   - `MenuIcon` — `MenuState` (lan/wifi/paused, pure mapping) + `MenuIconStyle` (icon / icon+label / label) + `MenuBarLabel` view used as the MenuBarExtra label.
   - `ToggleEngine` — **edge-based** decision logic, dependencies injected → testable.
   - `AppSettings` — UserDefaults. Physical wired + Wi-Fi = **opt-out** (`disabledWired`/`disabledWiFi`); virtual wired = **opt-in** (`enabledVirtual`, off by default). `notificationsEnabled`, `menuIconStyle`.

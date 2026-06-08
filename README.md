@@ -39,6 +39,7 @@ and back **on when you unplug** — edge-based, wake-aware, per-interface, and n
 - [Is it safe?](#is-it-safe)
 - [FAQ](#faq)
 - [Uninstall](#uninstall)
+- [Reporting a bug](#reporting-a-bug)
 - [Contributing](#contributing)
 - [Support](#support)
 - [License](#license)
@@ -202,6 +203,13 @@ brew uninstall --cask languard          # if installed via Homebrew
 defaults delete com.roy.languard        # forget all settings (optional)
 ```
 Also remove it under **System Settings → General → Login Items** if it's still listed.
+
+## Reporting a bug
+
+Hit something odd (Wi-Fi toggling when it shouldn't, etc.)? Turn on **Settings → Debug →
+Enable debug logging**, reproduce it, then click **Reveal Logs in Finder** and attach
+`~/Library/Logs/LanGuard/languard.log` to your [issue](https://github.com/roypadina/LanGuard/issues).
+The log stays on your Mac and contains only interface names + toggle decisions (no personal data).
 
 ## Contributing
 
